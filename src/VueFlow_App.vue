@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <aside class="palette">
-      <h3>Paleta UML</h3>
+      <h3>Use Cases Elements</h3>
       <div
         v-for="(item, index) in paletteItems"
         :key="index"

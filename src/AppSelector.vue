@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Selector de Vista UML</h2>
+    <h2>UML Diagrams</h2>
 
     <div style="margin-bottom: 20px;">
       <button @click="selectedView = 'html5'">Usar HTML5 Drag & Drop</button>
