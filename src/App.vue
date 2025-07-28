@@ -7,59 +7,63 @@
         v-for="(item, index) in paletteItems"
         :key="index"
         draggable="true"
-        @dragstart="onDragStart(item)"
+        @dragstart="onDragStart($event, item)"
       >
-        <img :src="item.icon" :alt="item.name" />
-        <span>{{ item.name }}</span>
+        <img :src="item.icon" :alt="item.label" />
+        <span>{{ item.label }}</span>
       </div>
     </aside>
 
     <main class="canvas-area">
-      <div
-        class="canvas"
-        @dragover.prevent
+      <VueFlow
+        v-model="elements"
+        class="vueflow-canvas"
         @drop="onDrop"
-      >
-        <div
-          v-for="(element, index) in canvasElements"
-          :key="index"
-          class="canvas-element"
-          :style="{ left: element.x + 'px', top: element.y + 'px' }"
-        >
-          <img :src="element.icon" :alt="element.name" />
-        </div>
-      </div>
+        @dragover.prevent
+        :default-viewport="{ zoom: 1.1, x: 0, y: 0 }"
+        :fit-view-on-init="true"
+      />
     </main>
   </div>
 </template>
 
 <script setup>
+import { VueFlow, useVueFlow } from '@braks/vue-flow'
 import { ref } from 'vue'
 
-// Elementos de la paleta
-const paletteItems = [
-  { name: 'Actor', icon: '/uml/actor.png' },
-  { name: 'Use Case', icon: '/uml/usecase.png' },
-  { name: '<<extend>>', icon: '/uml/extend.png' },
-  { name: '<<include>>', icon: '/uml/include.png' }
-]
+const { addNodes } = useVueFlow()
 
-// Elemento actualmente arrastrado
 const draggedItem = ref(null)
 
-// Lista de elementos colocados en el canvas
-const canvasElements = ref([])
+const paletteItems = [
+  { label: 'Actor', icon: '/uml/actor.png' },
+  { label: 'Use Case', icon: '/uml/usecase.png' },
+  { label: '<<extend>>', icon: '/uml/extend.png' },
+  { label: '<<include>>', icon: '/uml/include.png' }
+]
 
-function onDragStart(item) {
+const elements = ref([])
+
+function onDragStart(event, item) {
   draggedItem.value = item
 }
 
 function onDrop(event) {
+  const bounds = event.target.getBoundingClientRect()
+  const position = {
+    x: event.clientX - bounds.left,
+    y: event.clientY - bounds.top
+  }
+
   if (draggedItem.value) {
-    canvasElements.value.push({
-      ...draggedItem.value,
-      x: event.offsetX,
-      y: event.offsetY
+    elements.value.push({
+      id: `${draggedItem.value.label}-${+new Date()}`,
+      type: 'default',
+      position,
+      data: {
+        label: draggedItem.value.label,
+        icon: draggedItem.value.icon
+      }
     })
   }
 }
@@ -94,24 +98,11 @@ function onDrop(event) {
 
 .canvas-area {
   flex: 1;
-  padding: 1rem;
-}
-
-.canvas {
+  padding: 0;
   position: relative;
-  width: 100%;
-  height: 100%;
-  border: 2px dashed #ccc;
-  background-color: #fff;
 }
 
-.canvas-element {
-  position: absolute;
-  width: 40px;
-  height: 40px;
-}
-
-.canvas-element img {
+.vueflow-canvas {
   width: 100%;
   height: 100%;
 }

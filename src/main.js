@@ -1,5 +1,4 @@
-
 import { createApp } from 'vue'
-import App from './App.vue'
+import AppSelector from './AppSelector.vue' // o VueFlow_App.vue si lo quieres directo
 
-createApp(App).mount('#app')
+createApp(AppSelector).mount('#app')
